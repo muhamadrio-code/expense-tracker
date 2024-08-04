@@ -4,14 +4,18 @@ import 'package:expense_tracker/features/calendar/calendar_page.dart';
 import 'package:expense_tracker/features/dashboard/homepage.dart';
 import 'package:expense_tracker/shared/views/root_layout.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 const _pageKey = ValueKey("_pageKey");
 const _scaffoldKey = ValueKey("_scaffoldKey");
 
 const List<Destination> destinations = [
-  Destination(icon: Icon(Icons.home), label: "Home", route: "/"),
+  Destination(
+      icon: Icon(
+        Icons.home,
+      ),
+      label: "Home",
+      route: "/"),
   Destination(
       icon: Icon(Icons.calendar_month), label: "Calendar", route: "/calendar"),
   Destination(
@@ -26,7 +30,7 @@ class Destination {
       required this.route,
       this.child});
 
-  final Widget icon;
+  final Icon icon;
   final String label;
   final String route;
   final Widget? child;
