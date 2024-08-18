@@ -1,3 +1,4 @@
+import 'package:expense_tracker/providers/theme.dart';
 import 'package:expense_tracker/router/router.dart';
 import 'package:flutter/material.dart';
 
@@ -6,11 +7,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerDelegate: appRouter.routerDelegate,
-      routeInformationParser: appRouter.routeInformationParser,
-      routeInformationProvider: appRouter.routeInformationProvider,
+    return AppThemeBuilder(
+      builder: (context, light, dark, mode) => MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        themeMode: mode,
+        theme: light,
+        darkTheme: dark,
+        routerDelegate: appRouter.routerDelegate,
+        routeInformationParser: appRouter.routeInformationParser,
+        routeInformationProvider: appRouter.routeInformationProvider,
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:expense_tracker/shared/extensions.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
@@ -8,10 +9,18 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  bool mode = true;
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Homepage"),
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          mode = !mode;
+          context.setThemeMode(mode ? ThemeMode.dark : ThemeMode.light);
+        },
+        child: const Text("Homepage"),
+      ),
     );
   }
 }
