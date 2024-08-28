@@ -1,4 +1,4 @@
-import 'package:expense_tracker/shared/app_theme.dart';
+import 'package:expense_tracker/shared/color_scheme.dart';
 import 'package:flutter/material.dart';
 
 class AppThemeBuilder extends StatefulWidget {
@@ -50,14 +50,33 @@ class ThemeSettings {
 class ThemeProvider extends InheritedWidget {
   const ThemeProvider({super.key, required super.child});
 
+  final pageTransitionsTheme = const PageTransitionsTheme(
+    builders: <TargetPlatform, PageTransitionsBuilder>{
+      TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    },
+  );
+
+  ThemeData theme(ColorScheme colorScheme) => ThemeData(
+        useMaterial3: true,
+        pageTransitionsTheme: pageTransitionsTheme,
+        brightness: colorScheme.brightness,
+        colorScheme: colorScheme,
+        scaffoldBackgroundColor: colorScheme.surface,
+        navigationBarTheme: _navigationBarTheme(colorScheme),
+        bottomNavigationBarTheme: _bottomNavigationBarTheme(colorScheme),
+        listTileTheme: _listTileTheme(colorScheme),
+        canvasColor: colorScheme.surface,
+      );
+
   ThemeData light() {
-    final ColorScheme colorScheme = AppTheme.lightScheme();
-    return AppTheme.theme(colorScheme);
+    final ColorScheme colorScheme = AppColorScheme.lightScheme();
+    return theme(colorScheme);
   }
 
   ThemeData dark() {
-    final ColorScheme colorScheme = AppTheme.darkScheme();
-    return AppTheme.theme(colorScheme);
+    final ColorScheme colorScheme = AppColorScheme.darkScheme();
+    return theme(colorScheme);
   }
 
   static ThemeProvider of(BuildContext context) {
@@ -67,5 +86,40 @@ class ThemeProvider extends InheritedWidget {
   @override
   bool updateShouldNotify(ThemeProvider oldWidget) {
     return true;
+  }
+
+  NavigationBarThemeData _navigationBarTheme(ColorScheme colorScheme) {
+    return NavigationBarThemeData(
+      backgroundColor: colorScheme.surface,
+      indicatorColor: colorScheme.surface,
+    );
+  }
+
+  BottomNavigationBarThemeData _bottomNavigationBarTheme(
+      ColorScheme colorScheme) {
+    return BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        showSelectedLabels: true,
+        showUnselectedLabels: false,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
+        type: BottomNavigationBarType.shifting);
+  }
+
+  ListTileThemeData _listTileTheme(ColorScheme colorScheme) {
+    return ListTileThemeData(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      tileColor: Colors.white,
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      subtitleTextStyle: TextStyle(
+        color: colorScheme.onSurface.withOpacity(.5),
+        fontWeight: FontWeight.w900,
+        letterSpacing: .8,
+      ),
+    );
   }
 }

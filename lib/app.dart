@@ -12,7 +12,7 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         themeMode: mode,
         theme: light,
-        darkTheme: dark,
+        // darkTheme: dark,
         routerDelegate: appRouter.routerDelegate,
         routeInformationParser: appRouter.routeInformationParser,
         routeInformationProvider: appRouter.routeInformationProvider,

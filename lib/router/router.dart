@@ -33,38 +33,60 @@ class Destination {
 
 final appRouter =
     GoRouter(navigatorKey: _rootNavigationKey, initialLocation: '/', routes: [
-  StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) => RootLayout(
-            navigationShell: navigationShell,
-          ),
-      branches: [
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/',
-            pageBuilder: (context, state) =>
-                const MaterialPage(key: _pageKey, child: Homepage()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/analytics',
-            pageBuilder: (context, state) =>
-                const MaterialPage(key: _pageKey, child: AnaliticsPage()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/calendar',
-            pageBuilder: (context, state) =>
-                const MaterialPage(key: _pageKey, child: CalendarPage()),
-          ),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/asset',
-            pageBuilder: (context, state) =>
-                const MaterialPage(key: _pageKey, child: AssetPage()),
-          ),
-        ]),
-      ])
+  GoRoute(
+    path: '/',
+    pageBuilder: (context, state) => MaterialPage(
+      key: _pageKey,
+      child: RootLayout(
+        body: const Homepage(),
+        pageIndex: 0,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+      ),
+    ),
+  ),
+  GoRoute(
+    path: '/calendar',
+    pageBuilder: (context, state) => MaterialPage(
+      key: _pageKey,
+      child: RootLayout(
+        body: const CalendarPage(),
+        pageIndex: 1,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.calendar_month_outlined),
+        ),
+      ),
+    ),
+  ),
+  GoRoute(
+    path: '/analytics',
+    pageBuilder: (context, state) => MaterialPage(
+      key: _pageKey,
+      child: RootLayout(
+        body: const AnaliticsPage(),
+        pageIndex: 2,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.analytics),
+        ),
+      ),
+    ),
+  ),
+  GoRoute(
+    path: '/asset',
+    pageBuilder: (context, state) => MaterialPage(
+      key: _pageKey,
+      child: RootLayout(
+        body: const AssetPage(),
+        pageIndex: 3,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.assessment),
+        ),
+      ),
+    ),
+  ),
 ]);

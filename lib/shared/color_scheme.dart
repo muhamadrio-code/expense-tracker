@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static ThemeData theme(ColorScheme colorScheme) => ThemeData(
-        useMaterial3: true,
-        brightness: colorScheme.brightness,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: colorScheme.surface,
-        canvasColor: colorScheme.surface,
-      );
-
+class AppColorScheme {
   static ColorScheme lightScheme() {
     return const ColorScheme(
       brightness: Brightness.light,
@@ -50,7 +42,7 @@ class AppTheme {
       onTertiaryFixed: Color(0xff00201c),
       tertiaryFixedDim: Color(0xffa1d0c6),
       onTertiaryFixedVariant: Color(0xff204e47),
-      surfaceDim: Color(0xffdbdbcf),
+      surfaceDim: Color.fromARGB(255, 247, 247, 239),
       surfaceBright: Color(0xfffbfaed),
       surfaceContainerLowest: Color(0xffffffff),
       surfaceContainerLow: Color(0xfff5f4e8),
@@ -58,10 +50,6 @@ class AppTheme {
       surfaceContainerHigh: Color(0xffe9e9dd),
       surfaceContainerHighest: Color(0xffe3e3d7),
     );
-  }
-
-  ThemeData light() {
-    return theme(lightScheme());
   }
 
   static ColorScheme lightMediumContrastScheme() {
@@ -115,10 +103,6 @@ class AppTheme {
     );
   }
 
-  ThemeData lightMediumContrast() {
-    return theme(lightMediumContrastScheme());
-  }
-
   static ColorScheme lightHighContrastScheme() {
     return const ColorScheme(
       brightness: Brightness.light,
@@ -168,10 +152,6 @@ class AppTheme {
       surfaceContainerHigh: Color(0xffe9e9dd),
       surfaceContainerHighest: Color(0xffe3e3d7),
     );
-  }
-
-  ThemeData lightHighContrast() {
-    return theme(lightHighContrastScheme());
   }
 
   static ColorScheme darkScheme() {
@@ -225,10 +205,6 @@ class AppTheme {
     );
   }
 
-  ThemeData dark() {
-    return theme(darkScheme());
-  }
-
   static ColorScheme darkMediumContrastScheme() {
     return const ColorScheme(
       brightness: Brightness.dark,
@@ -280,10 +256,6 @@ class AppTheme {
     );
   }
 
-  ThemeData darkMediumContrast() {
-    return theme(darkMediumContrastScheme());
-  }
-
   static ColorScheme darkHighContrastScheme() {
     return const ColorScheme(
       brightness: Brightness.dark,
@@ -333,9 +305,5 @@ class AppTheme {
       surfaceContainerHigh: Color(0xff292b23),
       surfaceContainerHighest: Color(0xff34352d),
     );
-  }
-
-  ThemeData darkHighContrast() {
-    return theme(darkHighContrastScheme());
   }
 }
