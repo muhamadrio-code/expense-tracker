@@ -1,3 +1,4 @@
+import 'package:expense_tracker/features/add_todo/add_todo_page.dart';
 import 'package:expense_tracker/features/analytics/analitics.dart';
 import 'package:expense_tracker/features/asset/asset_page.dart';
 import 'package:expense_tracker/features/calendar/calendar_page.dart';
@@ -34,19 +35,27 @@ class Destination {
 final appRouter =
     GoRouter(navigatorKey: _rootNavigationKey, initialLocation: '/', routes: [
   GoRoute(
-    path: '/',
-    pageBuilder: (context, state) => MaterialPage(
-      key: _pageKey,
-      child: RootLayout(
-        body: const Homepage(),
-        pageIndex: 0,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.add),
-        ),
-      ),
-    ),
-  ),
+      path: '/',
+      pageBuilder: (context, state) => MaterialPage(
+            key: _pageKey,
+            child: RootLayout(
+              body: const Homepage(),
+              pageIndex: 0,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => context.goNamed("add-todo"),
+                child: const Icon(Icons.add),
+              ),
+            ),
+          ),
+      routes: [
+        GoRoute(
+          path: "add-todo",
+          name: "add-todo",
+          pageBuilder: (context, state) => const MaterialPage(
+            child: AddTodoPage(),
+          ),
+        )
+      ]),
   GoRoute(
     path: '/calendar',
     pageBuilder: (context, state) => MaterialPage(
