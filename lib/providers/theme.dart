@@ -114,7 +114,7 @@ class ThemeProvider extends InheritedWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       tileColor: Colors.white,
       shape: ContinuousRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
       ),
       subtitleTextStyle: TextStyle(
         color: colorScheme.onSurface.withOpacity(.5),
@@ -140,9 +140,17 @@ class ThemeProvider extends InheritedWidget {
 
   TabBarTheme _tabBarTheme(ColorScheme colorScheme) {
     return TabBarTheme(
-        labelPadding: const EdgeInsets.all(8),
-        indicatorColor: colorScheme.primary,
-        indicatorSize: TabBarIndicatorSize.tab);
+      labelPadding: const EdgeInsets.all(8),
+      overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+      labelColor: colorScheme.onPrimary,
+      indicatorColor: colorScheme.primary,
+      indicatorSize: TabBarIndicatorSize.tab,
+      dividerColor: Colors.transparent,
+      indicator: ShapeDecoration(
+        color: colorScheme.primary,
+        shape: const ContinuousRectangleBorder(),
+      ),
+    );
   }
 
   BottomSheetThemeData _bottomSheetTheme(ColorScheme colorScheme) {

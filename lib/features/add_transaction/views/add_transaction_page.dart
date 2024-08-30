@@ -43,12 +43,12 @@ class _AddTransactionNoteTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: const IntrinsicHeight(
         child: TextField(
@@ -58,14 +58,31 @@ class _AddTransactionNoteTextField extends StatelessWidget {
             fontSize: 16,
           ),
           decoration: InputDecoration(
+            contentPadding: EdgeInsets.all(12),
+            prefixIcon: Text(
+              "Catatan: ",
+              style: TextStyle(
+                  color: Colors.black45,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600),
+            ),
+            hintText: "Masukkan catatan...",
+            hintStyle: TextStyle(
+                color: Colors.black45,
+                fontSize: 16,
+                fontWeight: FontWeight.w600),
+            prefixIconConstraints: BoxConstraints(),
+            suffixIcon: Icon(
+              Icons.camera_alt_outlined,
+              size: 35,
+            ),
             border: InputBorder.none,
             isDense: true,
           ),
           keyboardType: TextInputType.multiline,
-          maxLines: null,
-          maxLength: 144,
+          maxLines: 2,
+          minLines: 1,
           autocorrect: false,
-          showCursor: false,
         ),
       ),
     );

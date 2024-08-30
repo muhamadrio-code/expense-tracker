@@ -43,15 +43,15 @@ final appRouter =
               body: const Homepage(),
               pageIndex: 0,
               floatingActionButton: FloatingActionButton(
-                onPressed: () => context.goNamed("add-todo"),
+                onPressed: () => context.goNamed("add-transaction"),
                 child: const Icon(Icons.add),
               ),
             ),
           ),
       routes: [
         GoRoute(
-          path: "add-todo",
-          name: "add-todo",
+          path: "add-transaction",
+          name: "add-transaction",
           pageBuilder: (context, state) {
             final repo = AddTransactionRepository();
             return MaterialPage(
