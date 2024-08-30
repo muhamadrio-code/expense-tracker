@@ -66,6 +66,7 @@ class ThemeProvider extends InheritedWidget {
         navigationBarTheme: _navigationBarTheme(colorScheme),
         bottomNavigationBarTheme: _bottomNavigationBarTheme(colorScheme),
         listTileTheme: _listTileTheme(colorScheme),
+        tabBarTheme: _tabBarTheme(colorScheme),
         canvasColor: colorScheme.surface,
       );
 
@@ -120,6 +121,33 @@ class ThemeProvider extends InheritedWidget {
         fontWeight: FontWeight.w900,
         letterSpacing: .8,
       ),
+    );
+  }
+
+  TextButtonThemeData _textButtonTheme(ColorScheme colorScheme) {
+    return TextButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all<Color>(colorScheme.primary),
+        foregroundColor: WidgetStateProperty.all<Color>(colorScheme.onPrimary),
+        shape: WidgetStateProperty.all<ContinuousRectangleBorder>(
+          ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        minimumSize:
+            WidgetStateProperty.all<Size>(const Size(double.infinity, 48)),
+      ),
+    );
+  }
+
+  TabBarTheme _tabBarTheme(ColorScheme colorScheme) {
+    return TabBarTheme(
+        labelPadding: const EdgeInsets.all(8),
+        indicatorColor: colorScheme.primary,
+        indicatorSize: TabBarIndicatorSize.tab);
+  }
+
+  BottomSheetThemeData _bottomSheetTheme(ColorScheme colorScheme) {
+    return BottomSheetThemeData(
+      backgroundColor: colorScheme.surfaceContainerLowest,
     );
   }
 }

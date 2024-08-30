@@ -1,4 +1,5 @@
-import 'package:expense_tracker/features/add_todo/add_todo_page.dart';
+import 'package:expense_tracker/features/add_transaction/views/add_transaction_page.dart';
+import 'package:expense_tracker/features/add_transaction/repositories/add_transaction_repository.dart';
 import 'package:expense_tracker/features/analytics/analitics.dart';
 import 'package:expense_tracker/features/asset/asset_page.dart';
 import 'package:expense_tracker/features/calendar/calendar_page.dart';
@@ -51,9 +52,12 @@ final appRouter =
         GoRoute(
           path: "add-todo",
           name: "add-todo",
-          pageBuilder: (context, state) => const MaterialPage(
-            child: AddTodoPage(),
-          ),
+          pageBuilder: (context, state) {
+            final repo = AddTransactionRepository();
+            return MaterialPage(
+              child: AddTransactionPage(repository: repo),
+            );
+          },
         )
       ]),
   GoRoute(
