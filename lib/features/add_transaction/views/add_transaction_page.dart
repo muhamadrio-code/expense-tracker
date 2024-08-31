@@ -1,12 +1,15 @@
+import 'package:expense_tracker/features/add_transaction/bloc/expense_form/transaction_form_bloc.dart';
 import 'package:expense_tracker/features/add_transaction/repositories/add_transaction_repository.dart';
 import 'package:expense_tracker/features/add_transaction/bloc/category_bloc.dart';
 import 'package:expense_tracker/features/add_transaction/categories.dart';
+import 'package:expense_tracker/shared/extensions.dart';
+import 'package:intl/intl.dart';
 import '../models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'add_transaction_appbar.dart';
-part 'add_transaction_numpad.dart';
+part 'transaction_form_view.dart';
 part 'add_transaction_categories.dart';
 
 class AddTransactionPage extends StatefulWidget {
@@ -23,66 +26,33 @@ class AddTransactionPage extends StatefulWidget {
 
 class _AddTransactionPageState extends State<AddTransactionPage>
     with SingleTickerProviderStateMixin {
+  final NumberFormat _numberFormat = NumberFormat.decimalPatternDigits(
+      locale: Intl.defaultLocale, decimalDigits: 2);
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CategoryBloc(
-        addTransactionRepository: widget.repository,
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) => CategoryBloc(
+                  addTransactionRepository: widget.repository,
+                )),
+        BlocProvider(
+            create: (context) => TransactionFormBloc(
+                  formatter: _numberFormat,
+                )),
+      ],
       child: const Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: _AddTransactionAppBar(),
-        body: _AddTransactionTabItem(),
-      ),
-    );
-  }
-}
-
-class _AddTransactionNoteTextField extends StatelessWidget {
-  const _AddTransactionNoteTextField({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const IntrinsicHeight(
-        child: TextField(
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(12),
-            prefixIcon: Text(
-              "Catatan: ",
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
-            ),
-            hintText: "Masukkan catatan...",
-            hintStyle: TextStyle(
-                color: Colors.black45,
-                fontSize: 16,
-                fontWeight: FontWeight.w600),
-            prefixIconConstraints: BoxConstraints(),
-            suffixIcon: Icon(
-              Icons.camera_alt_outlined,
-              size: 35,
-            ),
-            border: InputBorder.none,
-            isDense: true,
-          ),
-          keyboardType: TextInputType.multiline,
-          maxLines: 2,
-          minLines: 1,
-          autocorrect: false,
+        body: Column(
+          children: [
+            Expanded(child: _TransactionCategories()),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: _TransactionFormView(),
+            )
+          ],
         ),
       ),
     );

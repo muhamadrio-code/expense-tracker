@@ -67,6 +67,7 @@ class ThemeProvider extends InheritedWidget {
         bottomNavigationBarTheme: _bottomNavigationBarTheme(colorScheme),
         listTileTheme: _listTileTheme(colorScheme),
         tabBarTheme: _tabBarTheme(colorScheme),
+        textButtonTheme: _textButtonTheme(colorScheme),
         canvasColor: colorScheme.surface,
       );
 
@@ -127,8 +128,10 @@ class ThemeProvider extends InheritedWidget {
   TextButtonThemeData _textButtonTheme(ColorScheme colorScheme) {
     return TextButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all<Color>(colorScheme.primary),
-        foregroundColor: WidgetStateProperty.all<Color>(colorScheme.onPrimary),
+        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.all(0.0)),
+        backgroundColor: WidgetStateProperty.all<Color>(colorScheme.surfaceDim),
+        foregroundColor: WidgetStateProperty.all<Color>(colorScheme.onSurface),
         shape: WidgetStateProperty.all<ContinuousRectangleBorder>(
           ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -150,12 +153,6 @@ class ThemeProvider extends InheritedWidget {
         color: colorScheme.primary,
         shape: const ContinuousRectangleBorder(),
       ),
-    );
-  }
-
-  BottomSheetThemeData _bottomSheetTheme(ColorScheme colorScheme) {
-    return BottomSheetThemeData(
-      backgroundColor: colorScheme.surfaceContainerLowest,
     );
   }
 }
