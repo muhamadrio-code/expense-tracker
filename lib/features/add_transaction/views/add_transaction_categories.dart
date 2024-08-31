@@ -10,10 +10,10 @@ class _TransactionCategories extends StatelessWidget {
           return GridView.count(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             shrinkWrap: true,
-            mainAxisSpacing: 16,
+            mainAxisSpacing: 0,
             crossAxisSpacing: 8,
-            crossAxisCount: 3,
-            childAspectRatio: 2,
+            crossAxisCount: 4,
+            // childAspectRatio: 2 / 1.5,
             children: state.categoryType == CategoryType.expense
                 ? _expenseCategoriesGrid(state.categoryIndex)
                 : _incomeCategoriesGrid(state.categoryIndex),
@@ -35,30 +35,30 @@ class _TransactionCategories extends StatelessWidget {
                 ),
               );
         },
-        child: Container(
-          alignment: Alignment.center,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color:
-                      e.$1 == selectedIndex ? Colors.amber : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  e.$2.iconData,
-                  size: 35,
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color:
+                    e.$1 == selectedIndex ? Colors.amber : Colors.transparent,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 4),
-              Text(e.$2.name)
-            ],
-          ),
+              child: Icon(
+                e.$2.iconData,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Flexible(
+                child: Text(
+              e.$2.name,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ))
+          ],
         ),
       );
     });

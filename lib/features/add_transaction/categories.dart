@@ -3,7 +3,7 @@ import 'models/models.dart';
 
 final expenseCategory = <CategoryData>[
   CategoryData(
-    name: "Makanan",
+    name: "Makanan ringan",
     iconData: Icons.food_bank_outlined,
     type: CategoryType.expense,
   ),
