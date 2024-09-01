@@ -9,7 +9,13 @@ class _TransactionFormView extends StatelessWidget {
       decoration: const BoxDecoration(color: Colors.white),
       child: Column(
         children: [
-          const _ExpenseTextField(),
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: _ExpenseTextField(),
+            ),
+          ),
           const _NoteTextField(),
           GridView.count(
             padding: const EdgeInsets.only(bottom: 16),
@@ -142,10 +148,11 @@ class _ExpenseTextField extends StatelessWidget {
           state,
           style: const TextStyle(
             color: Colors.black87,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             fontSize: 32,
           ),
           maxLines: 1,
+          textAlign: TextAlign.end,
         );
       },
     );
