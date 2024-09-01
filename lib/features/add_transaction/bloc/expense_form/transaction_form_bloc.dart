@@ -173,7 +173,7 @@ class TransactionFormBloc
     if (_numberFormat.minimumFractionDigits == 0) {
       _numberFormat.minimumFractionDigits = 1;
 
-      newMaxValue = 10;
+      newMaxValue = 1;
       while (state.value ~/ newMaxValue! > 0) {
         newMaxValue *= 10;
       }
