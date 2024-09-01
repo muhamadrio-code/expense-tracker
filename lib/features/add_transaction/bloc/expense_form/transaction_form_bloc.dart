@@ -35,54 +35,41 @@ class SubmitValueEvent extends TransactionFormEvent {}
 
 final class TransactionFormState extends Equatable {
   final int value;
+  final int maxValue;
+  final int decimalDigits;
   final String formattedValue;
 
   const TransactionFormState._({
     required this.value,
+    required this.maxValue,
+    required this.decimalDigits,
     required this.formattedValue,
   });
 
-  const TransactionFormState._opt({
-    int? value,
-    String? formattedValue,
-  }) : this._(
-          value: value ?? 0,
-          formattedValue: formattedValue ?? "0",
+  const TransactionFormState.initial()
+      : this._(
+          value: 0,
+          maxValue: constants.MAX_TRANSACTION,
+          decimalDigits: 0,
+          formattedValue: "0",
         );
-
-  const TransactionFormState.initial() : this._opt();
-
-  const TransactionFormState.commitValue({
-    int value = 0,
-    String formattedValue = "",
-  }) : this._opt(
-          value: value,
-          formattedValue: formattedValue,
-        );
-
-  const TransactionFormState.commitDecimalValue({
-    int value = 0,
-    String formattedValue = "",
-  }) : this._opt(
-          value: value,
-          formattedValue: formattedValue,
-        );
-
-  const TransactionFormState.requestFormattedValue(String formattedValue)
-      : this._opt(formattedValue: formattedValue);
 
   TransactionFormState copyWith({
     int? value,
+    int? maxValue,
+    int? decimalDigits,
     String? formattedValue,
   }) {
     return TransactionFormState._(
       value: value ?? this.value,
+      maxValue: maxValue ?? this.maxValue,
+      decimalDigits: decimalDigits ?? this.decimalDigits,
       formattedValue: formattedValue ?? this.formattedValue,
     );
   }
 
   @override
-  List<Object?> get props => [value, formattedValue];
+  List<Object?> get props => [value, formattedValue, maxValue, decimalDigits];
 }
 
 class TransactionFormBloc
@@ -105,32 +92,35 @@ class TransactionFormBloc
     Emitter<TransactionFormState> emit,
   ) {
     bool isDecimal = _numberFormat.minimumFractionDigits > 0;
-    int currDecimalDigits = _numberFormat.maximumFractionDigits;
+    int currDecimalDigits = _numberFormat.minimumFractionDigits;
     int decimalDigits = _numberFormat.decimalDigits ?? 0;
 
     int x = state.value * 10;
     int v = event.value % 10;
     int z = pow(10, currDecimalDigits).toInt();
 
-    int newValue;
-    if (x < constants.MAX_TRANSACTION && !isDecimal) {
+    print("isDecimal=$isDecimal, currDecimalDigits=$currDecimalDigits");
+    print("x=$x, mx=${state.maxValue}, z=$z, maxdec=${state.decimalDigits}");
+
+    int newValue = state.value;
+    if (x < state.maxValue && !isDecimal) {
       newValue = x + v;
-    } else if (x > constants.MAX_TRANSACTION && !isDecimal) {
-      newValue = (state.value ~/ 10) * 10 + v;
-    } else if (x < constants.MAX_TRANSACTION * z && isDecimal) {
+      print("state1");
+    } else if (x < state.maxValue * z && isDecimal) {
       newValue = (state.value * 10) + v;
+      print("state2");
     } else {
       newValue = (state.value ~/ 10) * 10 + v;
+      print("state3");
     }
 
-    emit(TransactionFormState.commitValue(
+    emit(state.copyWith(
       value: newValue,
       formattedValue: _numberFormat.format(newValue / z),
+      decimalDigits: currDecimalDigits,
     ));
 
     if (isDecimal && currDecimalDigits < decimalDigits) {
-      _numberFormat.maximumFractionDigits =
-          min(decimalDigits, currDecimalDigits + 1);
       _numberFormat.minimumFractionDigits =
           min(decimalDigits, currDecimalDigits + 1);
     }
@@ -140,25 +130,38 @@ class TransactionFormBloc
     GetFormattedValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    emit(TransactionFormState.requestFormattedValue(state.formattedValue));
+    emit(state.copyWith(formattedValue: state.formattedValue));
   }
 
   FutureOr<void> _onDeleteValueEventHandler(
     DeleteValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    if (_numberFormat.minimumFractionDigits > 0) {
-      int min = _numberFormat.minimumFractionDigits;
-      _numberFormat.maximumFractionDigits = min - 1;
-      _numberFormat.minimumFractionDigits = min - 1;
+    int requiredDigits = _numberFormat.decimalDigits ?? 0;
+    int preDecimalDigits = state.decimalDigits;
+    if (preDecimalDigits == requiredDigits) {
+      _numberFormat.minimumFractionDigits = preDecimalDigits - 1;
+    } else {
+      _numberFormat.minimumFractionDigits = 0;
     }
 
-    int z = pow(10, _numberFormat.minimumFractionDigits).toInt();
+    int postDecimalDigits = _numberFormat.minimumFractionDigits;
+    int z = pow(10, postDecimalDigits).toInt();
     int newValue = state.value ~/ 10;
-    emit(TransactionFormState.commitValue(
+
+    emit(state.copyWith(
       value: newValue,
       formattedValue: _numberFormat.format(newValue / z),
+      decimalDigits: postDecimalDigits,
+      maxValue:
+          postDecimalDigits == 0 ? constants.MAX_TRANSACTION : state.maxValue,
     ));
+
+    if (postDecimalDigits < requiredDigits &&
+        preDecimalDigits == requiredDigits) {
+      _numberFormat.minimumFractionDigits =
+          max(requiredDigits, postDecimalDigits + 1);
+    }
   }
 
   FutureOr<void> _onSubmitValueEventHandler(
@@ -173,12 +176,20 @@ class TransactionFormBloc
     RequestDecimalValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    _numberFormat.maximumFractionDigits = 1;
-    _numberFormat.minimumFractionDigits = 1;
+    int? newMaxValue;
+    if (_numberFormat.minimumFractionDigits == 0) {
+      _numberFormat.minimumFractionDigits = 1;
 
-    emit(TransactionFormState.commitDecimalValue(
-      value: state.value,
+      newMaxValue = 10;
+      while (state.value ~/ newMaxValue! > 0) {
+        newMaxValue *= 10;
+      }
+    }
+
+    emit(state.copyWith(
       formattedValue: _numberFormat.format(state.value),
+      maxValue: newMaxValue ?? state.maxValue,
+      decimalDigits: _numberFormat.minimumFractionDigits,
     ));
   }
 }
