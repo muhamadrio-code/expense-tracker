@@ -99,19 +99,13 @@ class TransactionFormBloc
     int v = event.value % 10;
     int z = pow(10, currDecimalDigits).toInt();
 
-    print("isDecimal=$isDecimal, currDecimalDigits=$currDecimalDigits");
-    print("x=$x, mx=${state.maxValue}, z=$z, maxdec=${state.decimalDigits}");
-
     int newValue = state.value;
     if (x < state.maxValue && !isDecimal) {
       newValue = x + v;
-      print("state1");
     } else if (x < state.maxValue * z && isDecimal) {
       newValue = (state.value * 10) + v;
-      print("state2");
     } else {
       newValue = (state.value ~/ 10) * 10 + v;
-      print("state3");
     }
 
     emit(state.copyWith(
@@ -168,8 +162,7 @@ class TransactionFormBloc
     SubmitValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    print(state);
-    // close();
+    throw UnimplementedError();
   }
 
   FutureOr<void> _onRequestDecimalValueEventHandler(
