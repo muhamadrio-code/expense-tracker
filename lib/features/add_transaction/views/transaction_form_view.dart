@@ -7,70 +7,62 @@ class _TransactionFormView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: const BoxDecoration(color: Colors.white),
-      child: Column(
+      child: const Column(
         children: [
-          const Align(
+          Align(
             alignment: Alignment.centerRight,
             child: Padding(
               padding: EdgeInsets.all(8.0),
               child: _ExpenseTextField(),
             ),
           ),
-          const _NoteTextField(),
-          GridView.count(
-            padding: const EdgeInsets.only(bottom: 16),
-            childAspectRatio: 2 / 1.1,
-            crossAxisCount: 4,
-            crossAxisSpacing: 4,
-            mainAxisSpacing: 4,
-            shrinkWrap: true,
-            children: List.generate(
-              16,
-              _createNumpadTile,
-            ),
-          ),
+          _NoteTextField(),
+          _NumpadTiles(),
         ],
       ),
     );
   }
+}
 
-  Widget _createNumpadTile(int index) {
+class _NumpadTiles extends StatelessWidget {
+  const _NumpadTiles();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      padding: const EdgeInsets.only(bottom: 16),
+      childAspectRatio: 2 / 1.1,
+      crossAxisCount: 4,
+      crossAxisSpacing: 4,
+      mainAxisSpacing: 4,
+      shrinkWrap: true,
+      children: List.generate(
+        16,
+        (index) => _NumpadTile(index: index),
+      ),
+    );
+  }
+}
+
+class _NumpadTile extends StatelessWidget {
+  final int index;
+
+  const _NumpadTile({required this.index});
+
+  @override
+  Widget build(BuildContext context) {
     return switch (index) {
-      0 || 1 || 2 => _createTextButton(
-          "${index + 1}",
-          (context) {
-            context.read<TransactionFormBloc>().add(
-                  AddValueEvent(
-                    value: (index + 1),
-                  ),
-                );
-          },
-        ),
-      4 || 5 || 6 => _createTextButton(
-          "$index",
-          (context) {
-            context.read<TransactionFormBloc>().add(
-                  AddValueEvent(
-                    value: (index),
-                  ),
-                );
-          },
-        ),
-      8 || 9 || 10 => _createTextButton(
-          "${index - 1}",
-          (context) {
-            context.read<TransactionFormBloc>().add(
-                  AddValueEvent(
-                    value: (index - 1),
-                  ),
-                );
-          },
-        ),
+      0 || 1 || 2 => _createTextButton("${index + 1}"),
+      4 || 5 || 6 => _createTextButton("$index"),
+      8 || 9 || 10 => _createTextButton("${index - 1}"),
+      12 => _createTextButton("00", value: 100),
+      13 => _createTextButton("0", value: 10),
+      14 => _createTextButton(".", handler: _requestDecimalValue),
       3 => _createButtonWithChild(
           const Icon(Icons.backspace_outlined),
           Colors.red[50],
-          (context) =>
-              context.read<TransactionFormBloc>().add(DeleteValueEvent())),
+          _deleteValue,
+        ),
       7 => _createButtonWithChild(
           const Icon(Icons.calendar_month_outlined),
           Colors.blue[50],
@@ -78,21 +70,6 @@ class _TransactionFormView extends StatelessWidget {
       11 => _createButtonWithChild(
           const Icon(Icons.wallet_outlined),
           Colors.yellow[50],
-        ),
-      12 => _createTextButton("00"),
-      13 => _createTextButton(
-          "0",
-          (context) {
-            context.read<TransactionFormBloc>().add(
-                  AddValueEvent(value: 10),
-                );
-          },
-        ),
-      14 => _createTextButton(
-          ".",
-          (context) {
-            context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
-          },
         ),
       15 => _createButtonWithChild(
           const Icon(
@@ -107,6 +84,18 @@ class _TransactionFormView extends StatelessWidget {
     };
   }
 
+  void _requestDecimalValue(BuildContext context) {
+    context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
+  }
+
+  void _addValue(BuildContext context, String value) {
+    context.read<TransactionFormBloc>().add(AddValueEvent(value: value));
+  }
+
+  void _deleteValue(BuildContext context) {
+    context.read<TransactionFormBloc>().add(DeleteValueEvent());
+  }
+
   Widget _createButtonWithChild(Widget child, Color? color,
       [Function(BuildContext)? handler]) {
     return Builder(builder: (context) {
@@ -119,20 +108,21 @@ class _TransactionFormView extends StatelessWidget {
     });
   }
 
-  Widget _createTextButton(String text, [Function(BuildContext)? handler]) {
-    return Builder(builder: (context) {
-      return TextButton(
-        onPressed: () => handler?.call(context),
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w800,
-            fontSize: 24,
-          ),
-        ),
-      );
-    });
+  Widget _createTextButton(String text,
+      {int value = 0, Function(BuildContext)? handler}) {
+    TextStyle defaultTextStyle = const TextStyle(
+      color: Colors.black87,
+      fontWeight: FontWeight.w700,
+      fontSize: 24,
+    );
+
+    return Builder(
+      builder: (context) => TextButton(
+        onPressed: () =>
+            handler == null ? _addValue(context, text) : handler.call(context),
+        child: Text(text, style: defaultTextStyle),
+      ),
+    );
   }
 }
 
