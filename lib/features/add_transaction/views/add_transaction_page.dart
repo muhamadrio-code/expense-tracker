@@ -43,12 +43,12 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                   formatter: _numberFormat,
                 )),
       ],
-      child: const Scaffold(
+      child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: _AddTransactionAppBar(),
+        appBar: const _AddTransactionAppBar(),
         body: Column(
           children: [
-            Expanded(child: _TransactionCategories()),
+            const Expanded(child: _TransactionCategories()),
             Align(
               alignment: Alignment.bottomCenter,
               child: _TransactionFormView(),

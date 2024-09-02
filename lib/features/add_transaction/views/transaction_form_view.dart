@@ -2,9 +2,11 @@ part of 'add_transaction_page.dart';
 
 class _TransactionFormView extends StatelessWidget {
   const _TransactionFormView();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.all(8),
       decoration: const BoxDecoration(color: Colors.white),
       child: const Column(
@@ -52,8 +54,7 @@ class _NumpadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<DateTime?> pickDate(BuildContext context) async =>
-        await showMyDatePicker(
+    Future<DateTime?> pickDate() async => await showMyDatePicker(
           currentDate: DateTime.now(),
           context: context,
           firstDate: DateTime(1990),
@@ -86,21 +87,31 @@ class _NumpadTile extends StatelessWidget {
               final localizations = MaterialLocalizations.of(context);
               final WidgetStateProperty<Color?> foregroundColor = date == null
                   ? defaultForegroundColor
-                  : WidgetStatePropertyAll(context.colors.primary);
+                  : WidgetStatePropertyAll(context.colors.onSecondaryContainer);
+              final buttonStyle = ButtonStyle(
+                backgroundColor:
+                    WidgetStatePropertyAll(context.colors.secondaryContainer),
+                foregroundColor: foregroundColor,
+              );
+
+              Widget child = Icon(
+                Icons.calendar_month,
+                color: context.colors.onSecondaryContainer,
+              );
+
+              if (date != null) {
+                child = Text(
+                  localizations.formatShortDate(date),
+                  textAlign: TextAlign.center,
+                );
+              }
 
               return TextButton(
-                  onPressed: () => pickDate(context),
-                  clipBehavior: Clip.hardEdge,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(Colors.blue[100]),
-                    foregroundColor: foregroundColor,
-                  ),
-                  child: date == null
-                      ? const Icon(Icons.calendar_month)
-                      : Text(
-                          localizations.formatShortDate(date),
-                          textAlign: TextAlign.center,
-                        ));
+                onPressed: pickDate,
+                clipBehavior: Clip.hardEdge,
+                style: buttonStyle,
+                child: child,
+              );
             });
       });
     }
@@ -118,7 +129,7 @@ class _NumpadTile extends StatelessWidget {
     }
 
     Widget createTextButton(String text,
-        {int value = 0, Function(BuildContext)? handler}) {
+        {int value = 0, void Function(BuildContext)? handler}) {
       TextStyle defaultTextStyle = const TextStyle(
         color: Colors.black87,
         fontWeight: FontWeight.w700,
@@ -138,25 +149,30 @@ class _NumpadTile extends StatelessWidget {
       0 || 1 || 2 => createTextButton("${index + 1}"),
       4 || 5 || 6 => createTextButton("$index"),
       8 || 9 || 10 => createTextButton("${index - 1}"),
-      12 => createTextButton("00", value: 100),
-      13 => createTextButton("0", value: 10),
+      12 => createTextButton("00"),
+      13 => createTextButton("0"),
       14 => createTextButton(".", handler: requestDecimalValue),
       3 => createButtonWithChild(
-          const Icon(Icons.backspace_outlined),
-          Colors.red[100],
+          Icon(
+            Icons.backspace_outlined,
+            color: context.colors.onSecondaryContainer,
+          ),
+          context.colors.secondaryContainer,
           deleteValue,
         ),
       7 => createCalendarTile(),
       11 => createButtonWithChild(
-          const Icon(Icons.wallet_outlined),
-          Colors.yellow[100],
-        ),
-      15 => createButtonWithChild(
-          const Icon(
-            Icons.check_rounded,
-            color: Colors.white,
+          Icon(
+            Icons.wallet_outlined,
+            color: context.colors.onSecondaryContainer,
           ),
-          Colors.black87,
+          context.colors.secondaryContainer),
+      15 => createButtonWithChild(
+          Icon(
+            Icons.check_rounded,
+            color: context.colors.surfaceContainerHighest,
+          ),
+          context.colors.onSurface.withOpacity(.87),
           (context) =>
               context.read<TransactionFormBloc>().add(SubmitValueEvent()),
         ),
