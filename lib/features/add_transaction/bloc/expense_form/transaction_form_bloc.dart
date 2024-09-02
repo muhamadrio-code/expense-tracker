@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:expense_tracker/shared/constants.dart' as constants;
@@ -84,7 +85,7 @@ final class TransactionFormBloc
   ) {
     var newValue = "${state.value}${event.value}";
     if (state.value == "0") {
-      newValue = event.value;
+      newValue = event.value == "00" ? "0" : event.value;
     }
     final dotIndex = newValue.indexOf(".");
     final isDecimal = dotIndex >= 0;
@@ -97,7 +98,7 @@ final class TransactionFormBloc
 
     if (isMaxDecimalDigits || isMaxLength) {
       newValue =
-          "${state.value.substring(0, state.value.length - 1)}${event.value}";
+          "${state.value.substring(0, min(state.value.length - 1, constants.MAX_STRING_LENGTH - event.value.length))}${event.value}";
     }
 
     emit(state.copyWith(value: newValue));
