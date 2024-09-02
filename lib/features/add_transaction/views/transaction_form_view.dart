@@ -36,6 +36,7 @@ class _TransactionFormViewState extends State<_TransactionFormView>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _bottomInset.dispose();
     super.dispose();
   }
 
