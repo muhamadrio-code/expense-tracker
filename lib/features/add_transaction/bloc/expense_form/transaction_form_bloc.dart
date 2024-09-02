@@ -89,16 +89,23 @@ final class TransactionFormBloc
     }
     final dotIndex = newValue.indexOf(".");
     final isDecimal = dotIndex >= 0;
-    final isMaxDecimalDigits = isDecimal &&
-        state.value.substring(dotIndex).length >
-            (requireNotNull(_numberFormat.decimalDigits));
+    final digits = requireNotNull(_numberFormat.decimalDigits);
+    final isMaxLengthReached = newValue.length > constants.MAX_STRING_LENGTH;
 
-    final isMaxLength =
-        !isDecimal && newValue.length > constants.MAX_STRING_LENGTH;
+    if (event.value == "00" && isDecimal ||
+        event.value == "00" && isMaxLengthReached) {
+      emit(state);
+      return;
+    }
 
-    if (isMaxDecimalDigits || isMaxLength) {
+    if (!isDecimal && isMaxLengthReached) {
       newValue =
           "${state.value.substring(0, min(state.value.length - 1, constants.MAX_STRING_LENGTH - event.value.length))}${event.value}";
+    }
+
+    if (isDecimal && state.value.substring(dotIndex).length > digits) {
+      newValue =
+          "${state.value.substring(0, state.value.length - 1)}${event.value}";
     }
 
     emit(state.copyWith(value: newValue));
