@@ -1,39 +1,97 @@
 part of 'add_transaction_page.dart';
 
-class _TransactionFormView extends StatelessWidget {
+const double _noteTextFieldMargin = 8.0;
+const double _mPadding = 8.0;
+const double _numpadWidgetHeight = 180;
+
+class _TransactionFormView extends StatefulWidget {
   const _TransactionFormView();
 
   @override
+  State<_TransactionFormView> createState() => _TransactionFormViewState();
+}
+
+class _TransactionFormViewState extends State<_TransactionFormView>
+    with WidgetsBindingObserver {
+  final ValueNotifier<double> _bottomInset = ValueNotifier(_mPadding);
+
+  Future<double> get bottomInset async {
+    check() => MediaQuery.of(context).viewInsets.bottom;
+    return await Future.delayed(
+        const Duration(milliseconds: 50), () => check());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    bottomInset.then((value) => _bottomInset.value = value);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.all(8),
-      decoration: const BoxDecoration(color: Colors.white),
-      child: const Column(
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
+    return ValueListenableBuilder(
+        valueListenable: _bottomInset,
+        builder: (context, bottomInset, _) {
+          var bottomPadding = _mPadding;
+          // double bottomInset = MediaQuery.of(context).viewInsets.bottom;
+          double newInset = bottomInset -
+              (_numpadWidgetHeight + bottomPadding + _noteTextFieldMargin);
+          bottomPadding = max(bottomPadding, newInset);
+
+          return DecoratedBox(
+            decoration:
+                BoxDecoration(color: context.colors.surfaceContainerLowest),
             child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: _ExpenseTextField(),
+              padding: EdgeInsets.only(
+                top: _mPadding,
+                left: _mPadding,
+                right: _mPadding,
+                bottom: bottomPadding,
+              ),
+              child: const Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.all(_mPadding),
+                      child: _ExpenseTextField(),
+                    ),
+                  ),
+                  _NoteTextField(),
+                  _NumpadTiles(
+                    height: _numpadWidgetHeight,
+                  ),
+                ],
+              ),
             ),
-          ),
-          _NoteTextField(),
-          _NumpadTiles(),
-        ],
-      ),
-    );
+          );
+        });
   }
 }
 
 class _NumpadTiles extends StatelessWidget {
-  const _NumpadTiles();
+  const _NumpadTiles({required this.height});
+  final double height;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final double hRatio = height / width;
     return GridView.count(
       padding: const EdgeInsets.only(bottom: 16),
-      childAspectRatio: 2 / 1.1,
+      childAspectRatio: 1 / hRatio,
       crossAxisCount: 4,
       crossAxisSpacing: 4,
       mainAxisSpacing: 4,
@@ -210,8 +268,8 @@ class _NoteTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: _mPadding),
+      margin: const EdgeInsets.only(bottom: _noteTextFieldMargin),
       decoration: BoxDecoration(
         color: context.colors.surfaceDim,
         borderRadius: BorderRadius.circular(8),

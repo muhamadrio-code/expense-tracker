@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:expense_tracker/features/add_transaction/bloc/expense_form/transaction_form_bloc.dart';
 import 'package:expense_tracker/features/add_transaction/repositories/add_transaction_repository.dart';
 import 'package:expense_tracker/features/add_transaction/bloc/category_bloc.dart';
@@ -43,12 +45,12 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                   formatter: _numberFormat,
                 )),
       ],
-      child: Scaffold(
+      child: const Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: const _AddTransactionAppBar(),
+        appBar: _AddTransactionAppBar(),
         body: Column(
           children: [
-            const Expanded(child: _TransactionCategories()),
+            Expanded(child: _TransactionCategories()),
             Align(
               alignment: Alignment.bottomCenter,
               child: _TransactionFormView(),
