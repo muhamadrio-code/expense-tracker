@@ -45,33 +45,113 @@ class _NumpadTiles extends StatelessWidget {
 }
 
 class _NumpadTile extends StatelessWidget {
-  final int index;
+  _NumpadTile({required this.index});
 
-  const _NumpadTile({required this.index});
+  final int index;
+  final ValueNotifier<DateTime?> _currentDate = ValueNotifier(null);
 
   @override
   Widget build(BuildContext context) {
+    Future<DateTime?> pickDate(BuildContext context) async =>
+        await showMyDatePicker(
+          currentDate: DateTime.now(),
+          context: context,
+          firstDate: DateTime(1990),
+          lastDate: DateTime(DateTime.now().year + 5),
+          initialDate: DateTime.now(),
+          cancelText: "Batalkan",
+          confirmText: "Konfirmasi",
+        ).then((date) => _currentDate.value = date);
+
+    void requestDecimalValue(BuildContext context) {
+      context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
+    }
+
+    void addValue(BuildContext context, String value) {
+      context.read<TransactionFormBloc>().add(AddValueEvent(value: value));
+    }
+
+    void deleteValue(BuildContext context) {
+      context.read<TransactionFormBloc>().add(DeleteValueEvent());
+    }
+
+    Widget createCalendarTile() {
+      return Builder(builder: (context) {
+        return ValueListenableBuilder(
+            valueListenable: _currentDate,
+            builder: (context, date, child) {
+              final theme = Theme.of(context).textButtonTheme;
+              final defaultForegroundColor = theme.style?.foregroundColor ??
+                  const WidgetStatePropertyAll(Colors.black);
+              final localizations = MaterialLocalizations.of(context);
+              final WidgetStateProperty<Color?> foregroundColor = date == null
+                  ? defaultForegroundColor
+                  : WidgetStatePropertyAll(context.colors.primary);
+
+              return TextButton(
+                  onPressed: () => pickDate(context),
+                  clipBehavior: Clip.hardEdge,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(Colors.blue[100]),
+                    foregroundColor: foregroundColor,
+                  ),
+                  child: date == null
+                      ? const Icon(Icons.calendar_month)
+                      : Text(
+                          localizations.formatShortDate(date),
+                          textAlign: TextAlign.center,
+                        ));
+            });
+      });
+    }
+
+    Widget createButtonWithChild(Widget child, Color? color,
+        [Function(BuildContext)? handler]) {
+      return Builder(builder: (context) {
+        return TextButton(
+          onPressed: () => handler?.call(context),
+          clipBehavior: Clip.antiAlias,
+          style: ButtonStyle(backgroundColor: WidgetStateProperty.all(color)),
+          child: child,
+        );
+      });
+    }
+
+    Widget createTextButton(String text,
+        {int value = 0, Function(BuildContext)? handler}) {
+      TextStyle defaultTextStyle = const TextStyle(
+        color: Colors.black87,
+        fontWeight: FontWeight.w700,
+        fontSize: 24,
+      );
+
+      return Builder(
+        builder: (context) => TextButton(
+          onPressed: () =>
+              handler == null ? addValue(context, text) : handler.call(context),
+          child: Text(text, style: defaultTextStyle),
+        ),
+      );
+    }
+
     return switch (index) {
-      0 || 1 || 2 => _createTextButton("${index + 1}"),
-      4 || 5 || 6 => _createTextButton("$index"),
-      8 || 9 || 10 => _createTextButton("${index - 1}"),
-      12 => _createTextButton("00", value: 100),
-      13 => _createTextButton("0", value: 10),
-      14 => _createTextButton(".", handler: _requestDecimalValue),
-      3 => _createButtonWithChild(
+      0 || 1 || 2 => createTextButton("${index + 1}"),
+      4 || 5 || 6 => createTextButton("$index"),
+      8 || 9 || 10 => createTextButton("${index - 1}"),
+      12 => createTextButton("00", value: 100),
+      13 => createTextButton("0", value: 10),
+      14 => createTextButton(".", handler: requestDecimalValue),
+      3 => createButtonWithChild(
           const Icon(Icons.backspace_outlined),
-          Colors.red[50],
-          _deleteValue,
+          Colors.red[100],
+          deleteValue,
         ),
-      7 => _createButtonWithChild(
-          const Icon(Icons.calendar_month_outlined),
-          Colors.blue[50],
-        ),
-      11 => _createButtonWithChild(
+      7 => createCalendarTile(),
+      11 => createButtonWithChild(
           const Icon(Icons.wallet_outlined),
-          Colors.yellow[50],
+          Colors.yellow[100],
         ),
-      15 => _createButtonWithChild(
+      15 => createButtonWithChild(
           const Icon(
             Icons.check_rounded,
             color: Colors.white,
@@ -82,47 +162,6 @@ class _NumpadTile extends StatelessWidget {
         ),
       int() => const Placeholder(),
     };
-  }
-
-  void _requestDecimalValue(BuildContext context) {
-    context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
-  }
-
-  void _addValue(BuildContext context, String value) {
-    context.read<TransactionFormBloc>().add(AddValueEvent(value: value));
-  }
-
-  void _deleteValue(BuildContext context) {
-    context.read<TransactionFormBloc>().add(DeleteValueEvent());
-  }
-
-  Widget _createButtonWithChild(Widget child, Color? color,
-      [Function(BuildContext)? handler]) {
-    return Builder(builder: (context) {
-      return TextButton(
-        onPressed: () => handler?.call(context),
-        clipBehavior: Clip.antiAlias,
-        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(color)),
-        child: child,
-      );
-    });
-  }
-
-  Widget _createTextButton(String text,
-      {int value = 0, Function(BuildContext)? handler}) {
-    TextStyle defaultTextStyle = const TextStyle(
-      color: Colors.black87,
-      fontWeight: FontWeight.w700,
-      fontSize: 24,
-    );
-
-    return Builder(
-      builder: (context) => TextButton(
-        onPressed: () =>
-            handler == null ? _addValue(context, text) : handler.call(context),
-        child: Text(text, style: defaultTextStyle),
-      ),
-    );
   }
 }
 

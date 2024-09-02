@@ -68,6 +68,8 @@ class ThemeProvider extends InheritedWidget {
         listTileTheme: _listTileTheme(colorScheme),
         tabBarTheme: _tabBarTheme(colorScheme),
         textButtonTheme: _textButtonTheme(colorScheme),
+        dialogTheme: _dialogTheme(colorScheme),
+        datePickerTheme: _datePickerTheme(colorScheme),
         canvasColor: colorScheme.surface,
       );
 
@@ -129,7 +131,7 @@ class ThemeProvider extends InheritedWidget {
     return TextButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-            const EdgeInsets.all(0.0)),
+            const EdgeInsets.all(4.0)),
         backgroundColor: WidgetStateProperty.all<Color>(colorScheme.surfaceDim),
         foregroundColor: WidgetStateProperty.all<Color>(colorScheme.onSurface),
         shape: WidgetStateProperty.all<ContinuousRectangleBorder>(
@@ -153,6 +155,32 @@ class ThemeProvider extends InheritedWidget {
         color: colorScheme.primary,
         shape: const ContinuousRectangleBorder(),
       ),
+    );
+  }
+
+  DialogTheme _dialogTheme(ColorScheme colorScheme) {
+    return DialogTheme(
+        shape:
+            ContinuousRectangleBorder(borderRadius: BorderRadius.circular(4)));
+  }
+
+  DatePickerThemeData _datePickerTheme(ColorScheme colorScheme) {
+    const TextStyle defaultTextStyle = TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 20,
+    );
+    final ButtonStyle defaultButtonStyle = ButtonStyle(
+      foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
+      backgroundColor: WidgetStateColor.transparent,
+      textStyle: const WidgetStatePropertyAll(defaultTextStyle),
+    );
+
+    return DatePickerThemeData(
+      shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      headerForegroundColor: colorScheme.onSurface,
+      headerHeadlineStyle: defaultTextStyle,
+      cancelButtonStyle: defaultButtonStyle,
+      confirmButtonStyle: defaultButtonStyle,
     );
   }
 }
