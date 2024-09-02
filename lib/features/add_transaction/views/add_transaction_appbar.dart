@@ -11,9 +11,6 @@ class _AddTransactionAppBar extends StatelessWidget
       child: AppBar(
         title: const Text("Add transaction"),
         bottom: _AddTransactionTabBar(),
-        actions: const [
-          _SaveButton(),
-        ],
         leading: const _BackButton(),
       ),
     );
@@ -54,33 +51,6 @@ class _AddTransactionTabBar extends StatelessWidget
 
   @override
   Size get preferredSize => const Size.fromHeight(kTextTabBarHeight);
-}
-
-class _SaveButton extends StatelessWidget {
-  const _SaveButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: IconButton(
-        onPressed: () {},
-        icon: const Text(
-          "Save",
-          style: TextStyle(color: Colors.white),
-        ),
-        style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(Colors.black87),
-            padding: WidgetStateProperty.all<EdgeInsets>(
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-            ),
-            shape: WidgetStateProperty.all<ContinuousRectangleBorder>(
-                ContinuousRectangleBorder(
-                    borderRadius: BorderRadius.circular(8))),
-            minimumSize: WidgetStateProperty.all<Size>(const Size(72, 30))),
-      ),
-    );
-  }
 }
 
 class _BackButton extends StatelessWidget {
