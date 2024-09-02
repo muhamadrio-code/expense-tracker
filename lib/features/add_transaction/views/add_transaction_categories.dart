@@ -47,7 +47,7 @@ class _TransactionCategories extends StatelessWidget {
               ),
               child: Icon(
                 e.$2.iconData,
-                size: 24,
+                size: 30,
               ),
             ),
             const SizedBox(height: 4),
