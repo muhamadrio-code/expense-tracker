@@ -8,62 +8,8 @@ import 'package:expense_tracker/shared/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-sealed class TransactionFormEvent extends Equatable {
-  @override
-  List<Object?> get props => [];
-}
-
-final class AddValueEvent extends TransactionFormEvent {
-  final String value;
-  AddValueEvent({required this.value});
-
-  @override
-  List<Object?> get props => [value];
-}
-
-final class DeleteValueEvent extends TransactionFormEvent {}
-
-final class RequestDecimalValueEvent extends TransactionFormEvent {}
-
-final class SubmitValueEvent extends TransactionFormEvent {}
-
-final class AddCreatedDateEvent extends TransactionFormEvent {
-  AddCreatedDateEvent({this.createdDate});
-  final DateTime? createdDate;
-
-  @override
-  List<Object?> get props => [createdDate];
-}
-
-final class TransactionFormState extends Equatable {
-  final FormData data;
-  final String? error;
-
-  const TransactionFormState._({
-    this.data = const FormData.empty(),
-    this.error,
-  });
-
-  const TransactionFormState.initial() : this._();
-  const TransactionFormState.error(String error) : this._(error: error);
-
-  TransactionFormState copyWith({
-    String? value,
-    String? formattedValue,
-    DateTime? createdDate,
-    String? error,
-  }) {
-    return TransactionFormState._(
-        data: data.copyWith(
-            value: value,
-            formattedValue: formattedValue,
-            createdDate: createdDate),
-        error: error ?? this.error);
-  }
-
-  @override
-  List<Object?> get props => [data, error];
-}
+part 'transaction_form_event.dart';
+part 'transaction_form_state.dart';
 
 final class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
@@ -76,6 +22,8 @@ final class TransactionFormBloc
     on<SubmitValueEvent>(_onSubmitValueEventHandler);
     on<RequestDecimalValueEvent>(_onRequestDecimalValueEventHandler);
     on<AddCreatedDateEvent>(_onAddCreatedDateEvent);
+    on<AddImageEvent>(_onAddImageEvent);
+    on<DeleteImageEvent>(_onDeleteImageEvent);
 
     //!Make sure this event handler at the very bottom.
     on<TransactionFormEvent>(_onTransactionFormEventHandler);
@@ -179,5 +127,26 @@ final class TransactionFormBloc
     Emitter<TransactionFormState> emit,
   ) {
     emit(state.copyWith(createdDate: event.createdDate));
+  }
+
+  FutureOr<void> _onAddImageEvent(
+    AddImageEvent event,
+    Emitter<TransactionFormState> emit,
+  ) {
+    if (event.error == null) {
+      emit(state.copyWith(images: [...state.data.images, ...event.images]));
+    } else {
+      emit(state.copyWith(error: "Gagal mengambil gambar"));
+    }
+  }
+
+  FutureOr<void> _onDeleteImageEvent(
+    DeleteImageEvent event,
+    Emitter<TransactionFormState> emit,
+  ) {
+    final List<String> images = [...state.data.images];
+    images.removeAt(event.index);
+
+    emit(state.copyWith(images: images));
   }
 }

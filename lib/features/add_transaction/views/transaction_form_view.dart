@@ -113,6 +113,28 @@ class _NumpadTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void addCreatedDate(DateTime? date) {
+      context
+          .read<TransactionFormBloc>()
+          .add(AddCreatedDateEvent(createdDate: date));
+    }
+
+    void requestDecimalValue() {
+      context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
+    }
+
+    void addValue(String value) {
+      context.read<TransactionFormBloc>().add(AddValueEvent(value: value));
+    }
+
+    void deleteValue() {
+      context.read<TransactionFormBloc>().add(DeleteValueEvent());
+    }
+
+    void submitValue() {
+      context.read<TransactionFormBloc>().add(SubmitValueEvent());
+    }
+
     Future<DateTime?> pickDate() async => await showMyDatePicker(
           currentDate: DateTime.now(),
           context: context,
@@ -121,86 +143,73 @@ class _NumpadTile extends StatelessWidget {
           initialDate: DateTime.now(),
           cancelText: "Batalkan",
           confirmText: "Konfirmasi",
-        ).then((date) => _currentDate.value = date);
+        ).then((date) {
+          _currentDate.value = date;
+          addCreatedDate(date);
+          return null;
+        });
 
-    void requestDecimalValue(BuildContext context) {
-      context.read<TransactionFormBloc>().add(RequestDecimalValueEvent());
-    }
-
-    void addValue(BuildContext context, String value) {
-      context.read<TransactionFormBloc>().add(AddValueEvent(value: value));
-    }
-
-    void deleteValue(BuildContext context) {
-      context.read<TransactionFormBloc>().add(DeleteValueEvent());
-    }
+    final theme = Theme.of(context).textButtonTheme;
+    final defaultForegroundColor = theme.style?.foregroundColor ??
+        const WidgetStatePropertyAll(Colors.black);
+    final localizations = MaterialLocalizations.of(context);
 
     Widget createCalendarTile() {
-      return Builder(builder: (context) {
-        return ValueListenableBuilder(
-            valueListenable: _currentDate,
-            builder: (context, date, child) {
-              final theme = Theme.of(context).textButtonTheme;
-              final defaultForegroundColor = theme.style?.foregroundColor ??
-                  const WidgetStatePropertyAll(Colors.black);
-              final localizations = MaterialLocalizations.of(context);
-              final WidgetStateProperty<Color?> foregroundColor = date == null
-                  ? defaultForegroundColor
-                  : WidgetStatePropertyAll(context.colors.onSecondaryContainer);
-              final buttonStyle = ButtonStyle(
-                backgroundColor:
-                    WidgetStatePropertyAll(context.colors.secondaryContainer),
-                foregroundColor: foregroundColor,
-              );
+      return ValueListenableBuilder(
+          valueListenable: _currentDate,
+          builder: (context, date, child) {
+            final foregroundColor = date == null
+                ? defaultForegroundColor
+                : WidgetStatePropertyAll(context.colors.onSecondaryContainer);
 
-              Widget child = Icon(
-                Icons.calendar_month,
-                color: context.colors.onSecondaryContainer,
-              );
+            Widget child = Icon(
+              Icons.calendar_month,
+              color: context.colors.onSecondaryContainer,
+            );
 
-              if (date != null) {
-                child = Text(
-                  localizations.formatShortDate(date),
-                  textAlign: TextAlign.center,
-                );
-              }
+            final buttonStyle = ButtonStyle(
+              backgroundColor:
+                  WidgetStatePropertyAll(context.colors.secondaryContainer),
+              foregroundColor: foregroundColor,
+            );
 
-              return TextButton(
-                onPressed: pickDate,
-                clipBehavior: Clip.hardEdge,
-                style: buttonStyle,
-                child: child,
+            if (date != null) {
+              child = Text(
+                localizations.formatShortDate(date),
+                textAlign: TextAlign.center,
               );
-            });
-      });
+            }
+
+            return TextButton(
+              onPressed: pickDate,
+              clipBehavior: Clip.hardEdge,
+              style: buttonStyle,
+              child: child,
+            );
+          });
     }
 
     Widget createButtonWithChild(Widget child, Color? color,
-        [Function(BuildContext)? handler]) {
-      return Builder(builder: (context) {
-        return TextButton(
-          onPressed: () => handler?.call(context),
-          clipBehavior: Clip.antiAlias,
-          style: ButtonStyle(backgroundColor: WidgetStateProperty.all(color)),
-          child: child,
-        );
-      });
+        [Function()? handler]) {
+      return TextButton(
+        onPressed: () => handler?.call(),
+        clipBehavior: Clip.antiAlias,
+        style: ButtonStyle(backgroundColor: WidgetStateProperty.all(color)),
+        child: child,
+      );
     }
 
     Widget createTextButton(String text,
-        {int value = 0, void Function(BuildContext)? handler}) {
+        {int value = 0, void Function()? handler}) {
       TextStyle defaultTextStyle = const TextStyle(
         color: Colors.black87,
         fontWeight: FontWeight.w700,
         fontSize: 24,
       );
 
-      return Builder(
-        builder: (context) => TextButton(
-          onPressed: () =>
-              handler == null ? addValue(context, text) : handler.call(context),
-          child: Text(text, style: defaultTextStyle),
-        ),
+      return TextButton(
+        onPressed: () => handler == null ? addValue(text) : handler.call(),
+        child: Text(text, style: defaultTextStyle),
       );
     }
 
@@ -232,8 +241,7 @@ class _NumpadTile extends StatelessWidget {
             color: context.colors.surfaceContainerHighest,
           ),
           context.colors.onSurface.withOpacity(.87),
-          (context) =>
-              context.read<TransactionFormBloc>().add(SubmitValueEvent()),
+          submitValue,
         ),
       int() => const Placeholder(),
     };
@@ -246,7 +254,7 @@ class _ExpenseTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<TransactionFormBloc, TransactionFormState, String>(
-      selector: (state) => state.formattedValue,
+      selector: (state) => state.data.formattedValue,
       builder: (context, state) {
         return Text(
           state,
@@ -268,6 +276,47 @@ class _NoteTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget suffixIcon =
+        BlocSelector<TransactionFormBloc, TransactionFormState, List<String>>(
+            selector: (state) => state.data.images,
+            builder: (context, images) {
+              void saveImage(List<XFile> files) {
+                List<String> pathsString = files.map((e) => e.path).toList();
+                context
+                    .read<TransactionFormBloc>()
+                    .add(AddImageEvent.success(pathsString));
+              }
+
+              void onError(Exception e) {
+                context.read<TransactionFormBloc>().add(AddImageEvent.error(e));
+              }
+
+              const Widget cameraIcon = Icon(Icons.camera_alt);
+              const double iconSize = 24;
+
+              if (images.isEmpty) {
+                return IconButton(
+                  icon: cameraIcon,
+                  iconSize: iconSize,
+                  onPressed: () => showImagePickerDialog(
+                    context,
+                    onSuccess: saveImage,
+                    onError: onError,
+                  ),
+                );
+              }
+
+              return IconButton(
+                icon: Badge.count(count: images.length, child: cameraIcon),
+                iconSize: iconSize,
+                onPressed: () => openImagesSheet(context),
+              );
+            });
+
+    const TextStyle defaultTextStyle = TextStyle(
+        color: Colors.black45, fontSize: 16, fontWeight: FontWeight.w600);
+    const iconConstraints = BoxConstraints();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: _mPadding),
       margin: const EdgeInsets.only(bottom: _noteTextFieldMargin),
@@ -275,33 +324,20 @@ class _NoteTextField extends StatelessWidget {
         color: context.colors.surfaceDim,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const IntrinsicHeight(
+      child: IntrinsicHeight(
         child: TextField(
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
+          style: defaultTextStyle,
           decoration: InputDecoration(
-            contentPadding: EdgeInsets.all(16),
-            prefixIcon: Text(
+            contentPadding: const EdgeInsets.all(16),
+            prefixIcon: const Text(
               "Catatan: ",
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+              style: defaultTextStyle,
             ),
             hintText: "Masukkan catatan...",
-            hintStyle: TextStyle(
-                color: Colors.black45,
-                fontSize: 16,
-                fontWeight: FontWeight.w600),
-            prefixIconConstraints: BoxConstraints(),
-            suffixIconConstraints: BoxConstraints(),
-            suffixIcon: Icon(
-              Icons.camera_alt_outlined,
-              size: 24,
-            ),
+            hintStyle: defaultTextStyle,
+            prefixIconConstraints: iconConstraints,
+            suffixIconConstraints: iconConstraints,
+            suffixIcon: suffixIcon,
             border: InputBorder.none,
             isDense: true,
           ),
