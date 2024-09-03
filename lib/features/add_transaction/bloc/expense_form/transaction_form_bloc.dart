@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
+import 'package:expense_tracker/features/add_transaction/models/form_data.dart';
 import 'package:expense_tracker/shared/constants.dart' as constants;
 import 'package:expense_tracker/shared/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,47 +21,48 @@ final class AddValueEvent extends TransactionFormEvent {
   List<Object?> get props => [value];
 }
 
-final class GetFormattedValueEvent extends TransactionFormEvent {
-  final String formattedValue;
-  GetFormattedValueEvent({required this.formattedValue});
-
-  @override
-  List<Object?> get props => [formattedValue];
-}
-
 final class DeleteValueEvent extends TransactionFormEvent {}
 
 final class RequestDecimalValueEvent extends TransactionFormEvent {}
 
 final class SubmitValueEvent extends TransactionFormEvent {}
 
+final class AddCreatedDateEvent extends TransactionFormEvent {
+  AddCreatedDateEvent({this.createdDate});
+  final DateTime? createdDate;
+
+  @override
+  List<Object?> get props => [createdDate];
+}
+
 final class TransactionFormState extends Equatable {
-  final String value;
-  final String formattedValue;
+  final FormData data;
+  final String? error;
 
   const TransactionFormState._({
-    required this.value,
-    required this.formattedValue,
+    this.data = const FormData.empty(),
+    this.error,
   });
 
-  const TransactionFormState.initial()
-      : this._(
-          value: "0",
-          formattedValue: "0",
-        );
+  const TransactionFormState.initial() : this._();
+  const TransactionFormState.error(String error) : this._(error: error);
 
   TransactionFormState copyWith({
     String? value,
     String? formattedValue,
+    DateTime? createdDate,
+    String? error,
   }) {
     return TransactionFormState._(
-      value: value ?? this.value,
-      formattedValue: formattedValue ?? this.formattedValue,
-    );
+        data: data.copyWith(
+            value: value,
+            formattedValue: formattedValue,
+            createdDate: createdDate),
+        error: error ?? this.error);
   }
 
   @override
-  List<Object?> get props => [value, formattedValue];
+  List<Object?> get props => [data, error];
 }
 
 final class TransactionFormBloc
@@ -71,9 +73,11 @@ final class TransactionFormBloc
     _numberFormat.minimumFractionDigits = 0;
     on<AddValueEvent>(_onAddValueEventHandler);
     on<DeleteValueEvent>(_onDeleteValueEventHandler);
-    on<GetFormattedValueEvent>(_onGetDoubleValueEventHandler);
     on<SubmitValueEvent>(_onSubmitValueEventHandler);
     on<RequestDecimalValueEvent>(_onRequestDecimalValueEventHandler);
+    on<AddCreatedDateEvent>(_onAddCreatedDateEvent);
+
+    //!Make sure this event handler at the very bottom.
     on<TransactionFormEvent>(_onTransactionFormEventHandler);
   }
 
@@ -83,8 +87,9 @@ final class TransactionFormBloc
     AddValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    var newValue = "${state.value}${event.value}";
-    if (state.value == "0") {
+    var newValue = "${state.data.value}${event.value}";
+
+    if (state.data.value == "0") {
       newValue = event.value == "00" ? "0" : event.value;
     }
     final dotIndex = newValue.indexOf(".");
@@ -100,33 +105,28 @@ final class TransactionFormBloc
 
     if (!isDecimal && isMaxLengthReached) {
       newValue =
-          "${state.value.substring(0, min(state.value.length - 1, constants.MAX_STRING_LENGTH - event.value.length))}${event.value}";
+          "${state.data.value.substring(0, min(state.data.value.length - 1, constants.MAX_STRING_LENGTH - event.value.length))}${event.value}";
     }
 
-    if (isDecimal && state.value.substring(dotIndex).length > digits) {
+    if (isDecimal && state.data.value.substring(dotIndex).length > digits) {
       newValue =
-          "${state.value.substring(0, state.value.length - 1)}${event.value}";
+          "${state.data.value.substring(0, state.data.value.length - 1)}${event.value}";
     }
 
     emit(state.copyWith(value: newValue));
   }
 
-  void _onGetDoubleValueEventHandler(
-    GetFormattedValueEvent event,
-    Emitter<TransactionFormState> emit,
-  ) {}
-
   void _onDeleteValueEventHandler(
     DeleteValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    if (state.value == "0") return;
-    if (state.value.length == 1) {
+    if (state.data.value == "0") return;
+    if (state.data.value.length == 1) {
       emit(state.copyWith(value: "0"));
       return;
     }
     emit(state.copyWith(
-      value: state.value.substring(0, state.value.length - 1),
+      value: state.data.value.substring(0, state.data.value.length - 1),
     ));
   }
 
@@ -134,16 +134,24 @@ final class TransactionFormBloc
     SubmitValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    throw UnimplementedError();
+    final createdDate = state.data.createdDate ?? DateTime.now();
+    final hasValue = state.data.value != "0";
+    if (!hasValue) {
+      emit(const TransactionFormState.error("Masukkan jumlah"));
+    } else {
+      emit(state.copyWith(createdDate: createdDate));
+    }
+
+    print(state);
   }
 
   void _onRequestDecimalValueEventHandler(
     RequestDecimalValueEvent event,
     Emitter<TransactionFormState> emit,
   ) {
-    if (!state.value.contains(".")) {
-      final value = "${state.value}.";
-      final formattedValue = "${state.formattedValue}.";
+    if (!state.data.value.contains(".")) {
+      final value = "${state.data.value}.";
+      final formattedValue = "${state.data.formattedValue}.";
       emit(state.copyWith(value: value, formattedValue: formattedValue));
     }
   }
@@ -153,7 +161,7 @@ final class TransactionFormBloc
     Emitter<TransactionFormState> emit,
   ) {
     if (event is AddValueEvent || event is DeleteValueEvent) {
-      final value = state.value;
+      final value = state.data.value;
       final dotIndex = value.indexOf(".");
       final isDecimal = dotIndex >= 0;
       final intValue = isDecimal
@@ -164,5 +172,12 @@ final class TransactionFormBloc
       final formattedValue = _numberFormat.format(intValue) + digits;
       emit(state.copyWith(formattedValue: formattedValue));
     }
+  }
+
+  FutureOr<void> _onAddCreatedDateEvent(
+    AddCreatedDateEvent event,
+    Emitter<TransactionFormState> emit,
+  ) {
+    emit(state.copyWith(createdDate: event.createdDate));
   }
 }
