@@ -30,7 +30,9 @@ class _SliverHeaderDelegateComponent extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return const _SheetImagesHeader();
+    return const BottomSheetHeader(
+      title: "Foto",
+    );
   }
 
   @override
@@ -177,43 +179,6 @@ class _ImageTile extends StatelessWidget {
           ),
           deleteIcon
         ],
-      ),
-    );
-  }
-}
-
-class _SheetImagesHeader extends StatelessWidget {
-  const _SheetImagesHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    void closeSheet() => Navigator.pop(context);
-
-    final TextStyle titleStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-      color: context.colors.onSurface,
-      fontSize: 20,
-    );
-    final Widget title = Text(
-      "Foto",
-      style: titleStyle,
-    );
-
-    const Widget actionIcon = Icon(Icons.check_rounded);
-    final Widget action = IconButton(
-      onPressed: closeSheet,
-      icon: actionIcon,
-    );
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerHighest,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Expanded(child: title), Flexible(child: action)],
       ),
     );
   }

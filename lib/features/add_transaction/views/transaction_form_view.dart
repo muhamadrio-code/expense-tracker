@@ -46,10 +46,16 @@ class _TransactionFormViewState extends State<_TransactionFormView>
         valueListenable: _bottomInset,
         builder: (context, bottomInset, _) {
           var bottomPadding = _mPadding;
-          // double bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
           double newInset = bottomInset -
               (_numpadWidgetHeight + bottomPadding + _noteTextFieldMargin);
           bottomPadding = max(bottomPadding, newInset);
+
+          TextStyle defaultTextStyle = const TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+          );
 
           return DecoratedBox(
             decoration:
@@ -61,17 +67,24 @@ class _TransactionFormViewState extends State<_TransactionFormView>
                 right: _mPadding,
                 bottom: bottomPadding,
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.all(_mPadding),
-                      child: _ExpenseTextField(),
+                  Padding(
+                    padding: const EdgeInsets.all(_mPadding),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Jumlah",
+                          style: defaultTextStyle,
+                        ),
+                        const _ExpenseTextField()
+                      ],
                     ),
                   ),
-                  _NoteTextField(),
-                  _NumpadTiles(
+                  const _NoteTextField(),
+                  const _NumpadTiles(
                     height: _numpadWidgetHeight,
                   ),
                 ],

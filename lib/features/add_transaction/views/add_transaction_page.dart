@@ -9,6 +9,7 @@ import 'package:expense_tracker/features/add_transaction/categories.dart';
 import 'package:expense_tracker/shared/date_picker.dart';
 import 'package:expense_tracker/shared/extensions.dart';
 import 'package:expense_tracker/shared/image_picker.dart';
+import 'package:expense_tracker/shared/views/bottom_sheet_header.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
