@@ -12,7 +12,7 @@ extension ThemeUtils on BuildContext {
 
 extension TypographyUtils on BuildContext {
   ColorScheme get colors => theme.colorScheme;
-  TextTheme get textTheme => GoogleFonts.montserratTextTheme(theme.textTheme);
+  TextTheme get textTheme => GoogleFonts.ptSansTextTheme(theme.textTheme);
   TextStyle? get displayLarge => textTheme.displayLarge?.copyWith(
         color: colors.onSurface,
       );

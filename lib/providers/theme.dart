@@ -66,6 +66,10 @@ class ThemeProvider extends InheritedWidget {
         navigationBarTheme: _navigationBarTheme(colorScheme),
         bottomNavigationBarTheme: _bottomNavigationBarTheme(colorScheme),
         listTileTheme: _listTileTheme(colorScheme),
+        tabBarTheme: _tabBarTheme(colorScheme),
+        textButtonTheme: _textButtonTheme(colorScheme),
+        dialogTheme: _dialogTheme(colorScheme),
+        datePickerTheme: _datePickerTheme(colorScheme),
         canvasColor: colorScheme.surface,
       );
 
@@ -113,13 +117,70 @@ class ThemeProvider extends InheritedWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       tileColor: Colors.white,
       shape: ContinuousRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
       ),
       subtitleTextStyle: TextStyle(
         color: colorScheme.onSurface.withOpacity(.5),
         fontWeight: FontWeight.w900,
         letterSpacing: .8,
       ),
+    );
+  }
+
+  TextButtonThemeData _textButtonTheme(ColorScheme colorScheme) {
+    return TextButtonThemeData(
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+            const EdgeInsets.all(4.0)),
+        backgroundColor: WidgetStateProperty.all<Color>(colorScheme.surfaceDim),
+        foregroundColor: WidgetStateProperty.all<Color>(colorScheme.onSurface),
+        shape: WidgetStateProperty.all<ContinuousRectangleBorder>(
+          ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        minimumSize:
+            WidgetStateProperty.all<Size>(const Size(double.infinity, 48)),
+      ),
+    );
+  }
+
+  TabBarTheme _tabBarTheme(ColorScheme colorScheme) {
+    return TabBarTheme(
+      labelPadding: const EdgeInsets.all(8),
+      overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
+      labelColor: colorScheme.onPrimary,
+      indicatorColor: colorScheme.primary,
+      indicatorSize: TabBarIndicatorSize.tab,
+      dividerColor: Colors.transparent,
+      indicator: ShapeDecoration(
+        color: colorScheme.primary,
+        shape: const ContinuousRectangleBorder(),
+      ),
+    );
+  }
+
+  DialogTheme _dialogTheme(ColorScheme colorScheme) {
+    return DialogTheme(
+        shape:
+            ContinuousRectangleBorder(borderRadius: BorderRadius.circular(4)));
+  }
+
+  DatePickerThemeData _datePickerTheme(ColorScheme colorScheme) {
+    const TextStyle defaultTextStyle = TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 20,
+    );
+    final ButtonStyle defaultButtonStyle = ButtonStyle(
+      foregroundColor: WidgetStatePropertyAll(colorScheme.primary),
+      backgroundColor: WidgetStateColor.transparent,
+      textStyle: const WidgetStatePropertyAll(defaultTextStyle),
+    );
+
+    return DatePickerThemeData(
+      shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      headerForegroundColor: colorScheme.onSurface,
+      headerHeadlineStyle: defaultTextStyle,
+      cancelButtonStyle: defaultButtonStyle,
+      confirmButtonStyle: defaultButtonStyle,
     );
   }
 }
