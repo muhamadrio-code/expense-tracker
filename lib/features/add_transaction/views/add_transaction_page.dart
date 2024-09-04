@@ -64,7 +64,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
             bool isCategorySelected =
                 state != const CategoryBlocState.unknown();
             Matrix4 matrix = Matrix4.identity();
-            if (!isCategorySelected) matrix.translate(0, 500, 0);
+            if (!isCategorySelected) matrix.translate(0.0, 500.0, 0.0);
             return Column(
               children: [
                 const Expanded(child: _TransactionCategories()),
