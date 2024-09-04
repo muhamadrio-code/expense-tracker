@@ -61,8 +61,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
         appBar: const _AddTransactionAppBar(),
         body: BlocBuilder<CategoryBloc, CategoryBlocState>(
           builder: (context, state) {
-            bool isCategorySelected =
-                state != const CategoryBlocState.unknown();
+            bool isCategorySelected = state.categoryName.isNotEmpty;
             Matrix4 matrix = Matrix4.identity();
             if (!isCategorySelected) matrix.translate(0.0, 500.0, 0.0);
             return Column(

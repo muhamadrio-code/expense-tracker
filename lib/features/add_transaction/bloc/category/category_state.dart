@@ -14,7 +14,10 @@ class CategoryBlocState extends Equatable {
   const CategoryBlocState.unknown() : this._();
 
   CategoryBlocState.onCategoryChange(Category category)
-      : this._(categoryIndex: category.index, categoryType: category.type);
+      : this._(
+            categoryIndex: category.index,
+            categoryType: category.type,
+            categoryName: category.name);
 
   const CategoryBlocState.onCategoryTypeChange(CategoryType categoryType)
       : this._(categoryType: categoryType);
