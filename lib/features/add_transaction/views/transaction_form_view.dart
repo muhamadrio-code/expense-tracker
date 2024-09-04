@@ -42,24 +42,34 @@ class _TransactionFormViewState extends State<_TransactionFormView>
 
   @override
   Widget build(BuildContext context) {
+    const TextStyle prefixTextStyle = TextStyle(
+        color: Colors.black54,
+        fontWeight: FontWeight.w600,
+        fontSize: 20,
+        letterSpacing: 1.2);
+
+    const Widget prefixText = Text(
+      "Jumlah",
+      style: prefixTextStyle,
+    );
+
+    final BoxDecoration decoration =
+        BoxDecoration(color: context.colors.surfaceContainerLowest);
+
+    const Widget noteTextField = _NoteTextField();
+    const Widget numpad = _NumpadTiles(
+      height: _numpadWidgetHeight,
+    );
+
     return ValueListenableBuilder(
         valueListenable: _bottomInset,
         builder: (context, bottomInset, _) {
-          var bottomPadding = _mPadding;
-
           double newInset = bottomInset -
-              (_numpadWidgetHeight + bottomPadding + _noteTextFieldMargin);
-          bottomPadding = max(bottomPadding, newInset);
-
-          TextStyle defaultTextStyle = const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-          );
+              (_numpadWidgetHeight + _mPadding + _noteTextFieldMargin);
+          final bottomPadding = max(_mPadding, newInset);
 
           return DecoratedBox(
-            decoration:
-                BoxDecoration(color: context.colors.surfaceContainerLowest),
+            decoration: decoration,
             child: Padding(
               padding: EdgeInsets.only(
                 top: _mPadding,
@@ -67,26 +77,18 @@ class _TransactionFormViewState extends State<_TransactionFormView>
                 right: _mPadding,
                 bottom: bottomPadding,
               ),
-              child: Column(
+              child: const Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(_mPadding),
+                    padding: EdgeInsets.all(_mPadding),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Jumlah",
-                          style: defaultTextStyle,
-                        ),
-                        const _ExpenseTextField()
-                      ],
+                      children: [prefixText, _ExpenseTextField()],
                     ),
                   ),
-                  const _NoteTextField(),
-                  const _NumpadTiles(
-                    height: _numpadWidgetHeight,
-                  ),
+                  noteTextField,
+                  numpad,
                 ],
               ),
             ),
@@ -247,7 +249,9 @@ class _NumpadTile extends StatelessWidget {
             Icons.wallet_outlined,
             color: context.colors.onSecondaryContainer,
           ),
-          context.colors.secondaryContainer),
+          context.colors.secondaryContainer,
+          () => showAccountsModalBottomSheet(context),
+        ),
       15 => createButtonWithChild(
           Icon(
             Icons.check_rounded,
@@ -322,7 +326,7 @@ class _NoteTextField extends StatelessWidget {
               return IconButton(
                 icon: Badge.count(count: images.length, child: cameraIcon),
                 iconSize: iconSize,
-                onPressed: () => openImagesSheet(context),
+                onPressed: () => showImagesModalBottomSheet(context),
               );
             });
 

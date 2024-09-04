@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 class BottomSheetHeader extends StatelessWidget {
   final String title;
   final TextStyle? titleStyle;
-  final Icon? trailingIcon;
-  final Icon? leadingIcon;
+  final Widget? trailingIcon;
+  final Widget? leadingIcon;
   final Color? backgroundColor;
   final ButtonStyle? iconStyle;
   final bool centerTItle;
@@ -37,14 +37,8 @@ class BottomSheetHeader extends StatelessWidget {
       style: titleStyle,
     );
 
-    final Widget trailingIcon =
-        this.trailingIcon ?? const Icon(Icons.close_rounded);
-
-    final Widget trailingIconButton = IconButton(
-      style: iconStyle,
-      onPressed: closeSheet,
-      icon: trailingIcon,
-    );
+    final Widget leadingIcon =
+        this.leadingIcon ?? const Icon(Icons.close_rounded);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -55,22 +49,20 @@ class BottomSheetHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (leadingIcon != null) ...<Widget>[
-            Flexible(
-                child: IconButton(
-              style: iconStyle,
-              onPressed: closeSheet,
-              icon: leadingIcon!,
-            )),
-            const SizedBox(
-              width: 8,
-            )
-          ],
+          Flexible(
+              child: IconButton(
+            style: iconStyle,
+            onPressed: closeSheet,
+            icon: leadingIcon,
+          )),
+          const SizedBox(
+            width: 8,
+          ),
           Expanded(child: title),
           const SizedBox(
             width: 8,
           ),
-          Flexible(child: trailingIconButton)
+          if (trailingIcon != null) Flexible(child: trailingIcon!),
         ],
       ),
     );

@@ -1,53 +1,23 @@
-part of 'add_transaction_page.dart';
+part of '../add_transaction_page.dart';
 
-void openImagesSheet(BuildContext context) => showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const ContinuousRectangleBorder(),
-    constraints: const BoxConstraints(maxHeight: 500),
-    clipBehavior: Clip.hardEdge,
-    builder: (_) {
-      return BlocProvider.value(
-        value: BlocProvider.of<TransactionFormBloc>(context),
-        child: const CustomScrollView(
-          slivers: [
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SliverHeaderDelegateComponent(),
-            ),
-            SliverPadding(
-              padding: EdgeInsets.all(16),
-              sliver: _SliverImageTiles(),
-            )
-          ],
-        ),
-      );
-    });
+void showImagesModalBottomSheet(BuildContext context) {
+  Widget header = const SliverPersistentHeader(
+    pinned: true,
+    delegate: SliverBottomSheetHeaderDelegate(title: "Foto"),
+  );
 
-class _SliverHeaderDelegateComponent extends SliverPersistentHeaderDelegate {
-  const _SliverHeaderDelegateComponent();
+  Widget contentBuilder(BuildContext c) => const _SliverImagesGrid();
 
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return const BottomSheetHeader(
-      title: "Foto",
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      true;
-
-  @override
-  double get maxExtent => kToolbarHeight + 16;
-
-  @override
-  double get minExtent => kToolbarHeight + 16;
+  return sliverBlocBottomSheet(
+    context,
+    header: header,
+    bloc: BlocProvider.of<TransactionFormBloc>(context),
+    builder: contentBuilder,
+  );
 }
 
-class _SliverImageTiles extends StatelessWidget {
-  const _SliverImageTiles();
+class _SliverImagesGrid extends StatelessWidget {
+  const _SliverImagesGrid();
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +36,10 @@ class _SliverImageTiles extends StatelessWidget {
       context.read<TransactionFormBloc>().add(DeleteImageEvent(index: index));
     }
 
-    void viewImage(int index) {
-      //TODO: buat screen untuk view image;
+    void viewImage(List<String> images, int startIndex) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return ImagePreview(images: images, startIndex: startIndex);
+      }));
     }
 
     void showImagePicker() =>
@@ -101,24 +73,17 @@ class _SliverImageTiles extends StatelessWidget {
         return SliverGrid.builder(
           itemCount: images.length + 1,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-          ),
-          itemBuilder: (context, index) {
-            Widget widget;
-            if (index == 0) {
-              widget = addImageBox;
-            } else {
-              widget = _ImageTile(
-                path: images[index - 1],
-                onDelete: () => deleteImage(index - 1),
-                onPressed: () => viewImage(index - 1),
-              );
-            }
-
-            return widget;
-          },
+              crossAxisCount: 3,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1 / 1.1),
+          itemBuilder: (context, index) => index == 0
+              ? addImageBox
+              : _ImageTile(
+                  path: images[index - 1],
+                  onDelete: () => deleteImage(index - 1),
+                  onPressed: () => viewImage(images, index - 1),
+                ),
         );
       },
     );
@@ -138,10 +103,8 @@ class _ImageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final File file = File(path);
     final child = Image.file(
-      file,
-      fit: BoxFit.cover,
+      File(path),
     );
 
     final Widget deleteIcon = Align(
@@ -168,14 +131,22 @@ class _ImageTile extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Container(
-            clipBehavior: Clip.antiAlias,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey,
+          // *Container width & height must be defined to make FittedBox work
+          Hero(
+            tag: "hero image",
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              width: double.infinity,
+              height: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey,
+              ),
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: child,
+              ),
             ),
-            child: child,
           ),
           deleteIcon
         ],
