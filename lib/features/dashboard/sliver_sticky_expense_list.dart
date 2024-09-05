@@ -10,47 +10,47 @@ class SliverStickyExpenseList extends StatelessWidget {
   const SliverStickyExpenseList({
     EdgeInsetsGeometry? padding,
     super.key,
-  })  : _padding = padding ?? const EdgeInsets.all(16.0),
-        _titleText = "Upcoming",
-        _actionText = "See all >";
+  })  : _padding = padding ?? const EdgeInsets.all(0.0),
+        _titleText = "30 Agu Jumat",
+        _actionText = "Pengeluaran 500,000";
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-        padding: _padding,
-        sliver: SliverStickyHeader(
-          header: _SliverStickyExpenseListHeader(
-            title: Text(
+    TextStyle textStyle = TextStyle(
+      fontSize: 12,
+      color: context.colors.onSurface.withOpacity(.87),
+    );
+
+    Color backgroundColor = context.colors.surfaceContainerLow;
+
+    return SliverMainAxisGroup(slivers: [
+      SliverAppBar(
+        backgroundColor: backgroundColor,
+        title: Row(
+          children: [
+            Expanded(
+                child: Text(
               _titleText,
-              style: context.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.colors.onSurface.withOpacity(.5),
-              ),
-            ),
-            actions: [
-              Text(
-                _actionText,
-                style: context.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: context.colors.onSurface.withOpacity(.8),
-                ),
-              ),
-            ],
+              style: textStyle,
+            )),
+            Text(_actionText, style: textStyle),
+          ],
+        ),
+      ),
+      SliverList.separated(
+        separatorBuilder: (context, index) => const SizedBox(
+          height: 4,
+        ),
+        itemBuilder: (context, i) => ListTile(
+          title: Text("Title Tile $i"),
+          leading: const Icon(
+            Icons.alarm,
           ),
-          sliver: SliverList.separated(
-            separatorBuilder: (context, index) => const SizedBox(
-              height: 16,
-            ),
-            itemBuilder: (context, i) => ListTile(
-              title: Text("Title Tile $i"),
-              subtitle: Text("Subtitile $i"),
-              leading: const Icon(
-                Icons.alarm,
-              ),
-            ),
-            itemCount: 50,
-          ),
-        ));
+          trailing: const Text("50,000.00"),
+        ),
+        itemCount: 5,
+      ),
+    ]);
   }
 }
 

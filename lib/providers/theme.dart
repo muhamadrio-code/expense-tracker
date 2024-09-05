@@ -29,7 +29,11 @@ class _AppThemeBuilderState extends State<AppThemeBuilder> {
           builder: (context, value, child) {
             final theme = ThemeProvider.of(context);
             return widget.builder(
-                context, theme.light(), theme.dark(), value.themeMode);
+              context,
+              theme.light(),
+              theme.dark(),
+              value.themeMode,
+            );
           },
         ),
       ),
@@ -94,15 +98,23 @@ class ThemeProvider extends InheritedWidget {
 
   NavigationBarThemeData _navigationBarTheme(ColorScheme colorScheme) {
     return NavigationBarThemeData(
-      backgroundColor: colorScheme.surface,
-      indicatorColor: colorScheme.surface,
+      backgroundColor: colorScheme.surfaceContainerLow,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+      indicatorColor: Colors.transparent,
+      overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+      iconTheme: WidgetStateProperty.resolveWith((state) {
+        final Color color = state.contains(WidgetState.selected)
+            ? colorScheme.primary
+            : colorScheme.onSurface.withOpacity(.54);
+        return IconThemeData(color: color);
+      }),
     );
   }
 
   BottomNavigationBarThemeData _bottomNavigationBarTheme(
       ColorScheme colorScheme) {
     return BottomNavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.primary,
         unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
         selectedIconTheme: IconThemeData(color: colorScheme.primary),
         showSelectedLabels: true,
@@ -114,11 +126,9 @@ class ThemeProvider extends InheritedWidget {
 
   ListTileThemeData _listTileTheme(ColorScheme colorScheme) {
     return ListTileThemeData(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      tileColor: Colors.white,
-      shape: ContinuousRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      // tileColor: Colors.white,
+      leadingAndTrailingTextStyle: const TextStyle(fontSize: 18),
       subtitleTextStyle: TextStyle(
         color: colorScheme.onSurface.withOpacity(.5),
         fontWeight: FontWeight.w900,

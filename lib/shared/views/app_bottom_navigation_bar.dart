@@ -13,13 +13,13 @@ class AppBottomNavigationBar extends StatelessWidget {
     }
 
     final mDestinations = destinations
-        .map((e) => BottomNavigationBarItem(icon: e.icon, label: e.label))
+        .map((e) => NavigationDestination(icon: e.icon, label: e.label))
         .toList();
 
-    return BottomNavigationBar(
-      items: mDestinations,
-      onTap: onSelected,
-      currentIndex: currentIndex,
+    return NavigationBar(
+      destinations: mDestinations,
+      onDestinationSelected: onSelected,
+      selectedIndex: currentIndex,
     );
   }
 }

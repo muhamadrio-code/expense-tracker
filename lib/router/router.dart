@@ -3,7 +3,7 @@ import 'package:expense_tracker/features/add_transaction/repositories/add_transa
 import 'package:expense_tracker/features/analytics/analitics.dart';
 import 'package:expense_tracker/features/asset/asset_page.dart';
 import 'package:expense_tracker/features/calendar/calendar_page.dart';
-import 'package:expense_tracker/features/dashboard/homepage.dart';
+import 'package:expense_tracker/features/dashboard/dashboard_page.dart';
 import 'package:expense_tracker/shared/views/root_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -40,7 +40,7 @@ final appRouter =
       pageBuilder: (context, state) => MaterialPage(
             key: _pageKey,
             child: RootLayout(
-              body: const Homepage(),
+              body: const DashboardPage(),
               pageIndex: 0,
               floatingActionButton: FloatingActionButton(
                 onPressed: () => context.goNamed("add-transaction"),
